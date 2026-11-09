@@ -1,0 +1,8 @@
+/
+  Cache-Control: no-store
+/index.html
+  Cache-Control: no-store
+/analytics-gate.js
+  Cache-Control: no-store
+/events.js
+  Cache-Control: no-store
