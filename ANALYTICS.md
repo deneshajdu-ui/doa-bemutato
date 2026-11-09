@@ -13,3 +13,6 @@ No TTL or scheduled deletion exists. Daily JSON aggregates grow with days, not v
 Schema: CREATE TABLE event_daily(day TEXT PRIMARY KEY, payload TEXT NOT NULL DEFAULT '{}', updated TEXT NOT NULL, batches INTEGER NOT NULL DEFAULT 0);
 
 Rollback: remove /events.js script from index.html or set EVENTS_ENABLED=false then redeploy. Keep D1 for retained summaries. No destructive cleanup required.
+
+## Update: consent v2 / estimated unique browsers
+Supersedes the earlier no-persistent-ID design: user authorized pseudonymous unique-browser estimation. Fresh consent required. UUIDv4 stored in localStorage after consent; only SHA-256 digest and UTC day are kept in visitor_days. No event sequence is attached to it. Period uniques use COUNT(DISTINCT visitor), never sum daily counts. No IP/name/email collected by this database. Withdrawal deletes the local ID and stops collection, does not erase historical records. Storage failure means no unique-browser count; GPC/DNT disables measurement. Historical unique visitors cannot be reconstructed. Inactivity window increased from 60s to 600s; one-hour page cap remains. All other quota constraints preserved. Schema adds visitor_days(day TEXT,visitor TEXT,PRIMARY KEY(day,visitor)) WITHOUT ROWID and analytics_meta(key TEXT PRIMARY KEY,value TEXT) for measurement start.
