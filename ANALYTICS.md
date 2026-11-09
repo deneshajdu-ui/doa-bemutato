@@ -1,0 +1,15 @@
+# Anonymous presentation events — 2026-11-09
+
+User authorized separate EU D1 event storage, no paid subscriptions, no automatic retention deletion. Database binding EVENTS_DB; production-only EVENTS_ENABLED=true. Read-only summary key EVENTS_READ_KEY is a Cloudflare secret; never in source or browser. Műhely uses its own server runtime secret PRESENTATION_EVENTS_READ_KEY with authenticated access.
+
+Only aggregate daily counters are stored: page start, section viewed, scroll depth, navigation target once per page load, focused active seconds (60-second inactivity threshold; 1 hour/page maximum), active-time thresholds, tour container visible. No visitor/session identifier, IP, email, query strings, exact event timestamps or individual logs are stored in this database. Infrastructure access processing is separate. Tour visibility is not a play or an interaction within the cross-origin iframe.
+
+Optional client events start only after opt-in; localStorage stores consent yes/no only. GPC/DNT disables extra tracking. Footer settings allow withdrawal. Existing Cloudflare Web Analytics is separate. Each request validates a fixed allowlist and canonical origin; these checks do not prove a human visitor, and origin headers are not bot authentication. Counts can be affected by blockers, delivery failure and automated requests.
+
+Daily SQL counter is atomic with 10,000 accepted batches/day maximum. Browser flushes every 30s and when hidden, no retries. At most 15 counters per request stays below D1 bound-parameter limits. Limit/schema failures return errors and never delete existing data. Routes invoke Functions only for the two API paths. Free Cloudflare account quotas remain shared with other applications and may stop collection before our cap. No paid upgrade or purchase is configured here. Confirm actual account subscription in dashboard if a paid plan predates this work.
+
+No TTL or scheduled deletion exists. Daily JSON aggregates grow with days, not visitors. All-time summary is supported; the daily detail list is limited to 366 latest days while total counters cover the full selected range. Indefinite retention is not unlimited free storage. Cloudflare baseline analytics has its own retention and sampling, independent of this store.
+
+Schema: CREATE TABLE event_daily(day TEXT PRIMARY KEY, payload TEXT NOT NULL DEFAULT '{}', updated TEXT NOT NULL, batches INTEGER NOT NULL DEFAULT 0);
+
+Rollback: remove /events.js script from index.html or set EVENTS_ENABLED=false then redeploy. Keep D1 for retained summaries. No destructive cleanup required.
